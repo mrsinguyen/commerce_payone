@@ -1,0 +1,7 @@
+name = Payone payment methods
+description = Provides the Payone payment methods for Drupal Commerce stores.
+package = Payone
+dependencies[] = commerce
+dependencies[] = commerce_payment
+dependencies[] = libraries
+core = 7.x
