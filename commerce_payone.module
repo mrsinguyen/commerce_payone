@@ -108,6 +108,10 @@ function commerce_payone_txstatus() {
       case 'cc':
         commerce_payone_credit_transaction_status($_POST);
         break;
+      
+      case 'vor':
+        commerce_payone_prepayment_transaction_status($_POST);
+        break;
     }
     
   }  
@@ -160,4 +164,15 @@ function commerce_payone_redirect($order_id, $method, $status) {
 function commerce_payone_payment_transaction_load($txid) {
   $transactions = commerce_payment_transaction_load_multiple(array(), array('remote_id' => $txid));
   return $transactions ? reset($transactions) : FALSE;
+}
+
+function commerce_payone_payment_transaction_load_by_order($order) {
+  $query = new EntityFieldQuery;
+  $result = $query
+    ->entityCondition('entity_type', 'commerce_payment_transaction')
+    ->propertyCondition('order_id', $order->order_id)
+    ->propertyOrderBy('transaction_id', 'DESC')
+    ->range(0, 1)
+    ->execute();
+  return $result;
 }
