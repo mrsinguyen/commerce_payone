@@ -115,10 +115,7 @@ function commerce_payone_credit_redirect_form($form, &$form_state, $order, $paym
 }
 
 function commerce_payone_credit_redirect($order, $status) {
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  
-  
-  
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);  
   
   switch($status) {
     case 'success':
@@ -156,7 +153,7 @@ function commerce_payone_credit_redirect($order, $status) {
       $request->setPayment($payment);
       
       $response = $service->preauthorize($request);
-      print_r($response->toArray());
+      
       if($response->isError()) {
         $transaction = commerce_payment_transaction_new('commerce_payone_credit', $order->order_id);
         $transaction->instance_id = 0;
@@ -212,10 +209,13 @@ function commerce_payone_credit_redirect($order, $status) {
       break;
     
     case 'error':
+      $transaction = commerce_payment_transaction_new('commerce_payone_credit', $order->order_id);
       $transaction->status = COMMERCE_PAYMENT_STATUS_FAILURE;
-      $transaction->message = t('An error occured during payment process.');      
+      $transaction->message = t('An error occured during payment process.');
+      $transaction->amount = 0;
       commerce_payment_transaction_save($transaction);
-      commerce_payment_redirect_pane_prevous_page($order);
+      commerce_payment_redirect_pane_previous_page($order);
+      drupal_set_message(t('An error occurred and processing of the credit card did not complete. Please check your credit card data and try again.'), 'error');
       drupal_goto('checkout/' . $order->order_id . '/payment/return');
       break;
   }
