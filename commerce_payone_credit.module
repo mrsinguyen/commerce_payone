@@ -49,8 +49,11 @@ function commerce_payone_credit_settings_form($settings = array()) {
       'M',
       'A',
       'D',
-      'M',
-      'S'
+      'J',
+      'O',
+      'U',
+      'C',
+      'B'
     ))),
     '#default_value' => $settings['card_types'],
     '#required' => TRUE,
@@ -111,8 +114,6 @@ function commerce_payone_credit_redirect_form($form, &$form_state, $order, $paym
   $data['successurl'] .
   variable_get('payone_key', ''));
 
-  // dpm($hash->generate($request, variable_get('uc_payone_key', '')));
-
   foreach ($data as $key => $val) {
     if ($val) {
       $form[$key] = array(
@@ -124,20 +125,13 @@ function commerce_payone_credit_redirect_form($form, &$form_state, $order, $paym
 
   $form['#action'] = 'https://secure.pay1.de/client-api/';
 
+  // Add the credit card types array if necessary.
+  $card_types = array_diff(array_values($payment_method['settings']['card_types']), array(0));
+
   $form['cardtype'] = array(
     '#type' => 'select',
     '#title' => t('Card type'),
-    '#options' => array(
-      'V' => t('Visa'),
-      'M' => t('Mastercard'),
-      'A' => t('Amex'),
-      'D' => t('Diners'),
-      'J' => t('JCB'),
-      'O' => t('Maestro International'),
-      'U' => t('Maestro UK'),
-      'C' => t('Discover'),
-      'B' => t('Carte Bleue')
-    ),
+    '#options' => array_intersect_key(commerce_payone_credit_credit_card_types(), drupal_map_assoc((array) $card_types)),
     '#required' => TRUE
   );
 
