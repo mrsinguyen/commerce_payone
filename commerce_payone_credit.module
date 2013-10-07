@@ -17,7 +17,7 @@ function commerce_payone_credit_commerce_payment_method_info() {
 }
 
 /**
- * Returns the default settings for the PayPal WPP payment method.
+ * Returns the default settings for the Payone Credit payment method.
  */
 function commerce_payone_credit_default_settings() {
   return array(
@@ -167,6 +167,9 @@ function commerce_payone_credit_redirect_form($form, &$form_state, $order, $paym
   return $form;
 }
 
+/**
+ * Callback when redirect
+ */
 function commerce_payone_credit_redirect($order, $status) {
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
 
@@ -275,6 +278,9 @@ function commerce_payone_credit_redirect($order, $status) {
 
 }
 
+/**
+ * Callback for transaction status
+ */
 function commerce_payone_credit_transaction_status($data) {
   $transaction = commerce_payone_payment_transaction_load($_REQUEST['txid']);
 
