@@ -21,6 +21,7 @@ function commerce_payone_credit_commerce_payment_method_info() {
  */
 function commerce_payone_credit_default_settings() {
   return array(
+    'style' => array(0 => t('Select'), 1 => t('Radio')),
     'card_types' => drupal_map_assoc(array(
       'V',
       'M',
@@ -40,10 +41,18 @@ function commerce_payone_credit_settings_form($settings = array()) {
   // Merge default settings into the stored settings array.
   $settings = (array) $settings + commerce_payone_credit_default_settings();
 
+  $form['style'] = array(
+    '#type' => 'radios',
+    '#title' => t('Display style'),
+    '#default_value' => 1,
+    '#options' => array(0 => t('Select'), 1 => t('Radio')),
+    '#default_value' => $settings['style'],
+    '#description' => t(''),
+  );
   $form['card_types'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Limit accepted credit cards to the following types'),
-    '#description' => t('American Express is not available in the UK. Only MasterCard and Visa are available in Canada. If you enable Maestro or Solo, you must use GBP as your currency code.'),
+    '#description' => t(''),
     '#options' => array_intersect_key(commerce_payone_credit_credit_card_types(), drupal_map_assoc(array(
       'V',
       'M',
@@ -127,13 +136,23 @@ function commerce_payone_credit_redirect_form($form, &$form_state, $order, $paym
 
   // Add the credit card types array if necessary.
   $card_types = array_diff(array_values($payment_method['settings']['card_types']), array(0));
+  if ($payment_method['settings']['card_types'] == 0) {
+    $form['cardtype'] = array(
+      '#type' => 'select',
+      '#title' => t('Card type'),
+      '#options' => array_intersect_key(commerce_payone_credit_credit_card_types(), drupal_map_assoc((array) $card_types)),
+      '#required' => TRUE
+    );
+  }
+  else {
+    $form['cardtype'] = array(
+      '#type' => 'radios',
+      '#title' => t('Card type'),
+      '#options' => array_intersect_key(commerce_payone_credit_credit_card_types(), drupal_map_assoc((array) $card_types)),
+      '#required' => TRUE
+    );
+  }
 
-  $form['cardtype'] = array(
-    '#type' => 'select',
-    '#title' => t('Card type'),
-    '#options' => array_intersect_key(commerce_payone_credit_credit_card_types(), drupal_map_assoc((array) $card_types)),
-    '#required' => TRUE
-  );
 
   $form['cardpan'] = array(
     '#type' => 'textfield',
